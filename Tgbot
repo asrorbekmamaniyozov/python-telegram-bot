@@ -1,0 +1,43 @@
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
+# Telegram bot API tokeningizni kiriting
+TOKEN = '8160152409:AAEXpB2pAdoqMpEn2_V2YJktUUed8WjfS04'
+
+# Kinolar ma'lumotlarini saqlash uchun lug'at
+movies = {
+    "001": {"title": "Inception", "year": "2010", "genre": "Sci-Fi", "description": "A thief with the ability to enter dreams."},
+    "002": {"title": "The Matrix", "year": "1999", "genre": "Action", "description": "A hacker discovers the reality is a simulation."},
+    "003": {"title": "Interstellar", "year": "2014", "genre": "Adventure", "description": "A journey beyond the stars."},
+    # Ko'proq kinolar qo'shishingiz mumkin
+}
+
+def start(update, context):
+    update.message.reply_text("Salom! Kino haqida ma'lumot olish uchun kino kodini yuboring.")
+
+def search_movie(update, context):
+    code = update.message.text.strip()  # Kino kodini olamiz
+    movie = movies.get(code)  # Lug'atdan filmni qidiramiz
+
+    if movie:
+        # Film topilgan bo'lsa, ma'lumotni yuboramiz
+        message = (f"🎬 Nomi: {movie['title']}\n"
+                   f"📅 Yili: {movie['year']}\n"
+                   f"🎥 Janr: {movie['genre']}\n"
+                   f"📝 Tavsif: {movie['description']}")
+        update.message.reply_text(message)
+    else:
+        # Film topilmasa, xatolik xabarini yuboramiz
+        update.message.reply_text("Kechirasiz, bu kodga mos kino topilmadi.")
+
+def main():
+    updater = Updater(TOKEN, use_context=True)
+    dp = updater.dispatcher
+
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, search_movie))
+
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
